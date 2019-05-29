@@ -1,12 +1,13 @@
 /**
 *@file Scene.h
 */
-#ifndef SCENE_K_INCLUDED
+#ifndef SCENE_H_INCLUDED
 #define SCENE_H_INCLUDED
 #include <memory>
 #include <string>
+#include <vector>
 
-class SceneStack;
+//class SceneStack;
 
 /**
 * シーンの基底クラス
@@ -21,9 +22,9 @@ public:
 
 	virtual bool Initialize() = 0 {}
 	virtual void ProcessInput() = 0 {}
-	virtual void Update() = 0 {}
+	virtual void Update(float) = 0 {}
 	virtual void Render() = 0 {}
-	virtual void Finialize() = 0 {}
+	virtual void Finalize() = 0 {}
 
 	virtual void Play();
 	virtual void Stop();
@@ -42,4 +43,32 @@ private:
 };
 using ScenePtr = std::shared_ptr<Scene>;
 
-#endif // !SCENE_K_INCLUDED
+/**
+* シーン管理クラス
+*/
+class SceneStack
+{
+public:
+	static SceneStack& Instance();
+
+	void Push(ScenePtr);
+	void Pop();
+	void Replace(ScenePtr);	//前のシーンを新しいシーンに置き換える
+	Scene& Current();	//一番上にあるシーンを参照できる
+	const Scene& Current() const;
+	size_t Size() const;
+	bool Empty() const;
+
+	void Update(float);
+	void Render();
+
+private:
+	SceneStack();
+	SceneStack(const SceneStack&) = delete;
+	SceneStack& operator=(const SceneStack&) = delete;
+	~SceneStack() = default;
+
+	std::vector<ScenePtr>stack;
+};
+
+#endif // !SCENE_H_INCLUDED
